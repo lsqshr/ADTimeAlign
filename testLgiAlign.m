@@ -7,8 +7,8 @@ c(1,2) = 1;
 c(2,1) = 1;
 c(3:end,3:end) = 1;
 
-lambda = 1e-6;
-miu = 1e-6;
+lambda = 5e-2;
+miu = 1e-9;
 
 t1 = longitudinalAlign(L, t0, c, @(l)identityFilter(l), @(l)simpleSum(l), @(l)MSE(l), lambda, miu);
 disp(t1)

@@ -15,7 +15,7 @@ b(1:numel(t0)) = max(t0);
 b(numel(t0) + 1 : end) = min(t0);
 
 % Construct constraint 2: timepoints in same order
-g = @(t) elediff(t) .* c .* (elediff(t0) .* c);
+g = @(t) -elediff(t) .* c .* (elediff(t0) .* c);
 gfun = @(t) deal(g(t), []);
 
 [t1,fval,exitflag,output] = fmincon(@(t)costFunc(t, D, t0, c, v, lambda, miu), t0, A, b, [], [], [], [], gfun, options);
