@@ -1,7 +1,7 @@
-function t1 = longitudinalAlign(L, t0, c, filter, severityFunc, dissimilarFunc, lambda, miu)
+function [t1, sG] = longitudinalAlign(L, t0, c, filter, severityFunc, dissimilarFunc, nGSample, lambda, miu)
 	G = filter(L); 
 	v = severityFunc(L);
-	D = dissimilarFunc(G); % dissimilar matrix
+	D = dissimilarFunc(G); % Dissimilar matrix
 
 	options = optimoptions('fmincon','Algorithm','interior-point','Display','iter');
 
@@ -15,23 +15,28 @@ function t1 = longitudinalAlign(L, t0, c, filter, severityFunc, dissimilarFunc, 
 	b(numel(t0) + 1 : end) = min(t0);
 
 	% Construct constraint 2: timepoints in same order
-	g = @(t) -elediff(t) .* c .* (elediff(t0) .* c);
+	g = @(t) -elediff(t, t) .* c .* (elediff(t0, t0) .* c);
 	gfun = @(t) deal(g(t), []);
 
-	[t1,fval,exitflag,output] = fmincon(@(t)costFunc(t, D, t0, c, v, lambda, miu), t0, A, b, [], [], [], [], gfun, options);
+	% t0 -> t1
+	[t1,~,~,~] = fmincon(@(t)costFunc(t, D, t0, c, v, lambda, miu),...
+	                                    t0, A, b, [], [], [], [], gfun, options);
 
+    % Estimate disease progression model
+    tall = linspace(min(t1), max(t1), nGSample)';
+    w = eleweight(tall, t1);
+    %sG = sum(w * G, 2) ./ sum(w, 2); % spatial distribusion
+    sG = 0;
 end
 
 function cost = costFunc(t, D, t0, c, v, lambda, miu)
 
-	dt = elediff(t);
-	dt0 = elediff(t0);
-	dv = elediff(v);
+	dt = elediff(t, t);
+	dv = elediff(v, v);
 
 	% Calculate S(t)
-	w = dt0.^2; % costs of dissimilarity
-	h = max(t0) - min(t0);
-	w = exp(-w ./ h^2);
+    dt0 = elediff(t0, t0);
+	w = eleweight(t0, t0);
 	S = sum(sum(w.* D));
 
 	% Calculate R(t)
@@ -46,6 +51,3 @@ function cost = costFunc(t, D, t0, c, v, lambda, miu)
 
 end
 
-function d = elediff(t)
-    d = repmat(t',1,numel(t)) - repmat(t,numel(t),1);
-end
