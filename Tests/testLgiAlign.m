@@ -1,24 +1,25 @@
 function testLgiAlign()
-
+	NTEST = 110;
+	NTIMEPOINTS = 10;
 	LAMBDA = 5e-7;
 	MIU = 1e-7;
-    
-    % Previous Hand Crafted Data
-	%L = [2;4;2;3;5;6];
-	%t0 = [0,1,0,1,2,3];
-	%c = zeros(6,6);
-	%c(logical(eye(size(c)))) = 1;
-	%c(1,2) = 1;
-	%c(2,1) = 1;
-	%c(3:end,3:end) = 1;
 
-	[L,t0,c] = generateTests(100);
-	plotResults(L,t0,c,1, '-'); % Plot original data
-	
+	[L,t0,c] = generateTests(NTEST);
+	tL = L(NTEST-NTIMEPOINTS+1:end,:);
+	L = L(1:NTEST-NTIMEPOINTS,:);
+	tt0 = t0(NTEST-NTIMEPOINTS+1:end);
+	t0 = t0(1:NTEST-NTIMEPOINTS);
+	tc = c(NTEST-NTIMEPOINTS+1:end, NTEST-NTIMEPOINTS+1:end);
+	c = c(1:NTEST-NTIMEPOINTS,1:NTEST-NTIMEPOINTS);
+
     % Start Alignment fitting
-	[t1, sG] = longitudinalAlign(L, t0, c, @(l)identityFilter(l), @(l)simpleSum(l), @(l)MSE(l), 10, LAMBDA, MIU);
+	[t1, M] = longitudinalAlign(L, t0, c, @(l)identityFilter(l), @(l)simpleSum(l), NTIMEPOINTS, LAMBDA, MIU);
+
+	plotResults(L,t0,c,1, '-'); % Plot original data
     plotResults(L,t1,c,1, '--r'); % Plot results
-    
+
+    % Fit a new subject to the model
+    %t1_test = sbj2prog(tL, tt0, M, tc);    
 end
 
 
@@ -33,11 +34,9 @@ end
 
 
 function d = MSE(l)
-	l = sum(l, 2);
-	d = repmat(l,1,numel(l)) - repmat(l',numel(l),1);
+	d = elediff(l,l);
 	d = d.^2;
 end
-
 
 function [L, T, c] = generateTests(nSubject)
 	VMAX = 60;
@@ -51,7 +50,7 @@ function [L, T, c] = generateTests(nSubject)
 	seqlen = int32(nSubject * prop);
 	seqlen(end) = nSubject - sum(seqlen(1:end-1));
 
-	L = rand(1,nSubject) * 100;
+	L = rand(nSubject,1) * 100;
 	T = randi([0, 100], nSubject, 1);
 	c = zeros(nSubject, nSubject);
 	cidx = 1;
