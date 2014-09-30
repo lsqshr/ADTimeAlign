@@ -1,20 +1,26 @@
-function testLgiAlign()
-	NTEST = 110;
-	NTIMEPOINTS = 10;
+function testLgiAlign(testData)
+
 	LAMBDA = 5e-7;
 	MIU = 1e-7;
-	XI  = 1e-7;
+	XI  = 1e-12;
 
-	[L,t0,c] = generateTests(NTEST);
-	tL = L(NTEST-NTIMEPOINTS+1:end,:);
-	L = L(1:NTEST-NTIMEPOINTS,:);
-	tt0 = t0(NTEST-NTIMEPOINTS+1:end);
-	t0 = t0(1:NTEST-NTIMEPOINTS);
-	tc = c(NTEST-NTIMEPOINTS+1:end, NTEST-NTIMEPOINTS+1:end);
-	c = c(1:NTEST-NTIMEPOINTS,1:NTEST-NTIMEPOINTS);
+	if nargin == 0
+        NTOTAL = 110;
+        NNEW = 50;
+        [L,t0,c] = generateTests(NTOTAL);
+		tL = L(NTOTAL-NNEW+1:end,:);
+		L = L(1:NTOTAL-NNEW,:);
+		tt0 = t0(NTOTAL-NNEW+1:end);
+		t0 = t0(1:NTOTAL-NNEW);
+		tc = c(NTOTAL-NNEW+1:end, NTOTAL-NNEW+1:end);
+		c = c(1:NTOTAL-NNEW,1:NTOTAL-NNEW);
+	elseif strcmp(testData, 'adni')
+        NNEW = 20;
+	    [tL, L, tt0, t0, tc, c] = loadTestingHippo(NNEW);
+	end
 
     % Start Alignment fitting
-	[t1, M] = longitudinalAlign(L, t0, c, @(l)identityFilter(l), @(l)simpleSum(l), NTIMEPOINTS, LAMBDA, MIU);
+	[t1, M] = longitudinalAlign(L, t0, c, @(l)identityFilter(l), @(l)simpleSum(l), LAMBDA, MIU);
 
 	% Plot the fitting set
 	plotResults(L, t0, c, 1, '-'); % Plot original data
@@ -44,6 +50,7 @@ function d = MSE(l)
 	d = elediff(l,l);
 	d = d.^2;
 end
+
 
 function [L, T, c] = generateTests(nSubject)
 	VMAX = 60;
@@ -85,6 +92,8 @@ function plotResults(L, T, c, plotidx, lineSpec)
 	for s  = 1 : numel(tribes)
 	    l = L(tribes{s});
 	    t = T(tribes{s});
+        [t, I] = sort(t);
+        l = l(I);
 	    plot(t, l, lineSpec);
 	end
 	hold off;

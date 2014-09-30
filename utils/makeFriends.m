@@ -8,7 +8,13 @@ function T = makeFriends(tribes)
 	% Fill the relationship table
 	for t = 1 : numel(tribes)
 		tribe = tribes{t};
-		b = combntns(tribe, 2); % binary relationships
+		
+        if numel(tribe) > 1
+            b = combntns(tribe, 2); % binary relationships
+        else
+            continue
+        end
+        
 		invb = [];
 	    invb(:,1) = b(:,2);
 		invb(:,2) = b(:,1);

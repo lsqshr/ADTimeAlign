@@ -1,7 +1,7 @@
 % Depends on the Fathom library to calculate the Bray-Curtis Dissimlarity Matrix
 % http://www.marine.usf.edu/user/djones/matlab/matlab.html
 
-function [t1, M] = longitudinalAlign(L, t0, c, filter, severityFunc, ntimepoints, lambda, miu)
+function [t1, M] = longitudinalAlign(L, t0, c, filter, severityFunc, lambda, miu)
 	G = filter(L); 
 	v = severityFunc(L);
 	D = f_dis(G, 'bc'); % Dissimilar matrix
