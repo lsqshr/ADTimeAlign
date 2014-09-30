@@ -3,6 +3,7 @@ function testLgiAlign()
 	NTIMEPOINTS = 10;
 	LAMBDA = 5e-7;
 	MIU = 1e-7;
+	XI  = 1e-7;
 
 	[L,t0,c] = generateTests(NTEST);
 	tL = L(NTEST-NTIMEPOINTS+1:end,:);
@@ -15,11 +16,17 @@ function testLgiAlign()
     % Start Alignment fitting
 	[t1, M] = longitudinalAlign(L, t0, c, @(l)identityFilter(l), @(l)simpleSum(l), NTIMEPOINTS, LAMBDA, MIU);
 
-	plotResults(L,t0,c,1, '-'); % Plot original data
-    plotResults(L,t1,c,1, '--r'); % Plot results
+	% Plot the fitting set
+	plotResults(L, t0, c, 1, '-'); % Plot original data
+    plotResults(L, t1, c, 1, '--r'); % Plot results
 
     % Fit a new subject to the model
-    %t1_test = sbj2prog(tL, tt0, M, tc);    
+    tt1 = sbj2prog(tL, tt0, M, tc, XI, @(l)identityFilter(l));
+
+    % Plot the testing set
+	plotResults(tL, tt0, tc, 2, '-'); % Plot original data
+    plotResults(tL, tt1, tc, 2, '--r'); % Plot results
+
 end
 
 
