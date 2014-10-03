@@ -1,4 +1,14 @@
+# Install ADNIMERGE library to use this script
+# ADNIMERGE contains a dxsum table which has the DXCHANGE column filled for all subjects 
+# Pre-requisite code:
+#'''
+# install.packages("Hmisc") 
+# install.packages("../your path/ADNIMERGE_0.0.1.tar.gz", repos=NULL, type="source") # this tar can be found in ADNI website 
+#                                                                   #Study Data->Study Info->Data & Database-> Merged ADNI 1/GO/2 Packages for R
+# install.packages("R.matlab")
+
 library(ADNIMERGE)
+library(R.matlab)
 
 # Filter FS features only keep 'complete features'
 fs1 <- read.csv("UCSFFSL_08_01_14.csv")

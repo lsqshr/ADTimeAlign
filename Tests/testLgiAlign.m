@@ -15,9 +15,18 @@ function testLgiAlign(testData)
 		tc = c(NTOTAL-NNEW+1:end, NTOTAL-NNEW+1:end);
 		c = c(1:NTOTAL-NNEW,1:NTOTAL-NNEW);
 	elseif strcmp(testData, 'adni')
-        NNEW = 20;
+        NNEW = 10;
+        
         df = load('hippo.mat');
-	    [tL, L, tt0, t0, tc, c] = loadHippo(df, NNEW);
+	    [L, t0, c] = loadHippo(df, 6);
+        NTOTAL = numel(t0);
+	    L = L(:, 1);
+		tL = L(NTOTAL-NNEW+1:end,:);
+		L = L(1:NTOTAL-NNEW,:);
+		tt0 = t0(NTOTAL-NNEW+1:end);
+		t0 = t0(1:NTOTAL-NNEW);
+		tc = c(NTOTAL-NNEW+1:end, NTOTAL-NNEW+1:end);
+		c = c(1:NTOTAL-NNEW,1:NTOTAL-NNEW);
     end
 
     plotResults(L, t0, c, 1, '-'); % Plot original data

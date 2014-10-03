@@ -1,5 +1,5 @@
-function [x, t, c] = loadHippo(dataFile)
-	x = [dataFile.leftHippo; rightHippo];
+function [x, t, c] = loadHippo(dataFile, filterLen)
+	x = [dataFile.lefthippo; dataFile.righthippo];
 	v = dataFile.VISCODE;
 	t = zeros(numel(v), 1);
 
@@ -12,25 +12,37 @@ function [x, t, c] = loadHippo(dataFile)
 	end
 
     % Make relationship table c and filter out the len(sequence) < 3
-    [Y, I] = sort(rid);
-    edgePts = find(diff(Y)>0); % Where there is a change in the next element 
-    edgePts = [0, edgePts, numel(I)];
-    ntribe  = numel(edgePts) - 1; 
+	[Y, I]  = sort(dataFile.RID);
+	edgePts = getEdges(Y);
+	ntribe  = numel(edgePts) - 1; 
 
-    tribes = {};
-    Y1 = [];
-    I1 = [];
-    ctr = 0;
+	Y1     = [];
+	I1     = [];
+	ctr    = 0;
 
+	% Filter out the sequences that are too short
     for i = 1 : ntribe
-        if edgePts(i+1) - edgePts(i) >= filterLen % Filter out the sequences that are too short
-            Y1 = [Y1, Y(edgePts(i)+1 : edgePts(i+1))];
-            I1 = [I1, I(edgePts(i)+1 : edgePts(i+1))];
+        if edgePts(i+1) - edgePts(i) >= filterLen 
+            Y1 = [Y1; Y(edgePts(i)+1 : edgePts(i+1))];
+            I1 = [I1; I(edgePts(i)+1 : edgePts(i+1))];
         end
     end
 
-    % Reorder the data and timepoints
+    % Make the tribes with the filtered sequences
+    tribes = {};
+	edgePts1 = getEdges(Y1);
+	ntribe1   = numel(edgePts1) - 1; 
+    for i = 1 : ntribe1
+        tribes{i} = edgePts1(i)+1 : edgePts1(i+1);
+    end
+    c = makeFriends(tribes);
+
+    % Re-order the data and timepoints
     x = x(I1, :);
     t = t(I1, :);
-    c = makeRelTable(Y1);
+end
+
+function edges = getEdges(Y)
+    edges = find(diff(Y)>0); % Where there is a change in the next element 
+    edges = [0; edges; numel(Y)];
 end
