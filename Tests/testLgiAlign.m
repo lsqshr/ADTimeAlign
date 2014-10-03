@@ -16,14 +16,17 @@ function testLgiAlign(testData)
 		c = c(1:NTOTAL-NNEW,1:NTOTAL-NNEW);
 	elseif strcmp(testData, 'adni')
         NNEW = 20;
-	    [tL, L, tt0, t0, tc, c] = loadTestingHippo(NNEW);
-	end
+        df = load('hippo.mat');
+	    [tL, L, tt0, t0, tc, c] = loadHippo(df, NNEW);
+    end
 
+    plotResults(L, t0, c, 1, '-'); % Plot original data
+    
     % Start Alignment fitting
 	[t1, M] = longitudinalAlign(L, t0, c, @(l)identityFilter(l), @(l)simpleSum(l), LAMBDA, MIU);
 
 	% Plot the fitting set
-	plotResults(L, t0, c, 1, '-'); % Plot original data
+	
     plotResults(L, t1, c, 1, '--r'); % Plot results
 
     % Fit a new subject to the model
