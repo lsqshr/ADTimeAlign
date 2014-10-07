@@ -18,9 +18,9 @@ function testLgiAlign(testData)
         NNEW = 10;
         
         df = load('hippo.mat');
-	    [L, t0, c] = loadHippo(df, 6);
+	    [L, t0, c] = loadHippo(df, 2, 1); % 1 stable NC 2. stable MCI 3. NC2MCI 4. MCI2AD 5 stable AD
         NTOTAL = numel(t0);
-	    L = L(:, 1);
+	    L = L(:, 2);
 		tL = L(NTOTAL-NNEW+1:end,:);
 		L = L(1:NTOTAL-NNEW,:);
 		tt0 = t0(NTOTAL-NNEW+1:end);

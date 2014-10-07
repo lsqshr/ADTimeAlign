@@ -7,6 +7,7 @@ function [t1, M] = longitudinalAlign(L, t0, c, filter, severityFunc, lambda, miu
 	D = f_dis(G, 'bc'); % Dissimilar matrix
 
 	options = optimoptions('fmincon','Algorithm','interior-point','Display','iter');
+    %options = optimoptions('fmincon','Hessian',{'lbfgs'});
 
     [A, b, gfun] = makeCons(t0, c);
 
