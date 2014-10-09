@@ -4,14 +4,11 @@
 
 function t1 = sbj2prog(L, t0, M, c, xi, filter)
 	G = filter(L);
-
-	options = optimoptions('fmincon','Algorithm','interior-point','Display','iter');
-
-    [A, b, gfun] = makeCons(t0, c);
-
+    [lb, ub, gfun] = makeCons(t0, c);
+    
 	% t0 -> t1
-	[t1,~,~,~] = fmincon(@(t)costFunc(t, M, L, t0, xi, c),...
-	                                    t0, A, b, [], [], [], [], gfun, options);
+ 	[t1,~,~,~] = fmincon(@(t)costFunc(t, M, L, t0, xi, c),...
+ 	                                    t0, [], [], [], [], lb, ub, gfun);
 end
 
 function cost = costFunc(t, M, L, t0, xi, c)

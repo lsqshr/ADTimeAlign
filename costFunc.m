@@ -1,4 +1,4 @@
-function [cost, H] = costFunc(t, D, t0, c, v, lambda, miu)
+function [cost] = costFunc(t, D, t0, c, v, lambda, miu)
 
 	dt = elediff(t, t);
 	dv = elediff(v, v);
@@ -18,5 +18,5 @@ function [cost, H] = costFunc(t, D, t0, c, v, lambda, miu)
 	V = sum(sum(V .* ~c));
 
 	cost = S + lambda * R + miu * V;
-    H = 2/h^2 .* D; % hessian matrix
+    %H = 2/h^2 .* D; % hessian matrix WRONG!
 end

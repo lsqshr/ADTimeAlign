@@ -1,7 +1,7 @@
 function testLgiAlign(testData)
 
-	LAMBDA = 5e-7;
-	MIU = 1e-7;
+	LAMBDA = 5e-12;
+	MIU = 1e-4;
 	XI  = 1e-12;
 
 	if nargin == 0
@@ -16,9 +16,8 @@ function testLgiAlign(testData)
 		c = c(1:NTOTAL-NNEW,1:NTOTAL-NNEW);
 	elseif strcmp(testData, 'adni')
         NNEW = 10;
-        
         df = load('hippo.mat');
-	    [L, t0, c] = loadHippo(df, 2, 1); % 1 stable NC 2. stable MCI 3. NC2MCI 4. MCI2AD 5 stable AD
+	    [L, t0, c] = loadHippo(df, 2, 4); % 1 stable NC 2. stable MCI 3. NC2MCI 4. MCI2AD 5 stable AD
         NTOTAL = numel(t0);
 	    L = L(:, 2);
 		tL = L(NTOTAL-NNEW+1:end,:);
@@ -35,8 +34,7 @@ function testLgiAlign(testData)
 	[t1, M] = longitudinalAlign(L, t0, c, @(l)identityFilter(l), @(l)simpleSum(l), LAMBDA, MIU);
 
 	% Plot the fitting set
-	
-    plotResults(L, t1, c, 1, '--r'); % Plot results
+	plotResults(L, t1, c, 1, '--r'); % Plot results
 
     % Fit a new subject to the model
     tt1 = sbj2prog(tL, tt0, M, tc, XI, @(l)identityFilter(l));

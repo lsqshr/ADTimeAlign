@@ -46,7 +46,20 @@ function [x, t, c] = loadHippo(dataFile, filterLen, filterLabel)
         tribes{i} = edgePts1(i)+1 : edgePts1(i+1);
         tribeT = t(edgePts1(i)+1 : edgePts1(i+1));
         t(edgePts1(i)+1 : edgePts1(i+1)) = (tribeT - min(tribeT)) / 3;
-        x(edgePts1(i)+1 : edgePts1(i+1), :) = x(edgePts1(i)+1 : edgePts1(i+1), :) ./ repmat(x(edgePts1(i)+1, :), edgePts1(i+1)-edgePts1(i), 1);
+        tx = x(edgePts1(i)+1 : edgePts1(i+1), :) ./ repmat(x(edgePts1(i)+1, :), edgePts1(i+1)-edgePts1(i), 1);
+        if size(tx, 1) == 1
+            continue
+        end
+        
+        for v = 2 : size(tx, 1)            
+            for r = 1 : size(tx, 2)
+                if tx(v,r) > tx(v-1,r)
+                     tx(v,r) = tx(v-1,r);
+                end
+            end
+        end
+        
+        x(edgePts1(i)+1 : edgePts1(i+1), :) = tx;
     end
     c = makeFriends(tribes);
 end
