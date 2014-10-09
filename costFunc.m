@@ -1,4 +1,10 @@
-function [cost] = costFunc(t, D, t0, c, v, lambda, miu)
+function cost = costFunc(theta, t0, L, c, filter, disFunc, sevFunc, lambda, miu)
+	t = theta(1:size(c,1));
+	w = theta(size(c) + 1 : end);
+
+	G = filter(L, w);
+	D = disFunc(G);
+	v = sevFunc(G);
 
 	dt = elediff(t, t);
 	dv = elediff(v, v);

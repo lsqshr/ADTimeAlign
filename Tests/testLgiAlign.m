@@ -19,7 +19,7 @@ function testLgiAlign(testData)
         df = load('hippo.mat');
 	    [L, t0, c] = loadHippo(df, 2, 4); % 1 stable NC 2. stable MCI 3. NC2MCI 4. MCI2AD 5 stable AD
         NTOTAL = numel(t0);
-	    L = L(:, 2);
+	    %L = L(:, 2);
 		tL = L(NTOTAL-NNEW+1:end,:);
 		L = L(1:NTOTAL-NNEW,:);
 		tt0 = t0(NTOTAL-NNEW+1:end);
@@ -27,27 +27,27 @@ function testLgiAlign(testData)
 		tc = c(NTOTAL-NNEW+1:end, NTOTAL-NNEW+1:end);
 		c = c(1:NTOTAL-NNEW,1:NTOTAL-NNEW);
     end
-
-    plotResults(L, t0, c, 1, '-'); % Plot original data
     
     % Start Alignment fitting
-	[t1, M] = longitudinalAlign(L, t0, c, @(l)identityFilter(l), @(l)simpleSum(l), LAMBDA, MIU);
+	[t1, w, M] = longitudinalAlign(L, t0, c, @(l, w)weightedFilter(l, w), @(l)simpleSum(l), LAMBDA, MIU);
+
+    plotResults(simplesum(weightedFilter(L, w)), t0, c, 1, '-'); % Plot original data
 
 	% Plot the fitting set
-	plotResults(L, t1, c, 1, '--r'); % Plot results
+	plotResults(simplesum(weightedFilter(L, w)), t1, c, 1, '--r'); % Plot results
 
-    % Fit a new subject to the model
-    tt1 = sbj2prog(tL, tt0, M, tc, XI, @(l)identityFilter(l));
-
-    % Plot the testing set
-	plotResults(tL, tt0, tc, 2, '-'); % Plot original data
-    plotResults(tL, tt1, tc, 2, '--r'); % Plot results
+%     % Fit a new subject to the model
+%     tt1 = sbj2prog(tL, tt0, M, tc, XI, @(l)identityFilter(l));
+% 
+%     % Plot the testing set
+% 	plotResults(tL, tt0, tc, 2, '-'); % Plot original data
+%     plotResults(tL, tt1, tc, 2, '--r'); % Plot results
 
 end
 
 
-function l = identityFilter(l)
-	l = l ;
+function l = weightedFilter(l, w)
+    l = l .* repmat(w', size(l, 1), 1);
 end
 
 
