@@ -41,4 +41,7 @@ hippo = subset(dxfs, select=c("RID","VISCODE", "ST29SV", "ST88SV", "DXCHANGE"));
 # Export to csv
 write.table(hippo, "LongtidudinalHippoADNI.csv", sep = "\t",)
 
-writeMat('hippo.mat', RID=hippo$RID, VISCODE=hippo$VISCODE, lefthippo=hippo$ST29SV, righthippo=hippo$ST88SV, dxchange=hippo$DXCHANGE)
+writeMat('hippo+ventricle.mat', RID=hippo$RID, VISCODE=dxfs$VISCODE, 
+         x=cbind(dxfs$ST29SV, dxfs$ST88SV, dxfs$ST30SV, dxfs$ST37SV,
+             dxfs$ST89SV, dxfs$ST8SV, dxfs$ST96SV, dxfs$ST9SV, dxfs$ST127SV), 
+         dxchange=hippo$DXCHANGE)

@@ -6,5 +6,5 @@ function [lb, ub, gfun] = makeCons(t0, c)
 	gfun = @(t) deal(g(t), []);
         
     ub(1:numel(t0),1) = max(t0);
-    lb = [];
+    lb(1:numel(t0),1) = min(t0);
 end

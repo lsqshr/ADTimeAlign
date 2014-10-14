@@ -1,7 +1,9 @@
-function [x, t, c] = loadHippo(dataFile, filterLen, filterLabel)
+function [newx, newt, c] = loadADNISeq(dataFile, filterLen, filterLabel)
 % filterLabel: 1 stable NC 2. stable MCI 3. NC2MCI 4. MCI2AD 5 stable AD
 
-	x = double([dataFile.lefthippo dataFile.righthippo]);
+	x = double(dataFile.x);
+    x(x<0)=0;
+    x(isnan(x))=0;
 	v = dataFile.VISCODE;
     
 	t = zeros(numel(v), 1);
@@ -42,24 +44,33 @@ function [x, t, c] = loadHippo(dataFile, filterLen, filterLabel)
     tribes = {};
 	edgePts1 = getEdges(Y1);
 	ntribe1   = numel(edgePts1) - 1; 
+    newx = [];
+    newt = [];
     for i = 1 : ntribe1
-        tribes{i} = edgePts1(i)+1 : edgePts1(i+1);
+        
         tribeT = t(edgePts1(i)+1 : edgePts1(i+1));
-        t(edgePts1(i)+1 : edgePts1(i+1)) = (tribeT - min(tribeT)) / 3;
-        tx = x(edgePts1(i)+1 : edgePts1(i+1), :) ./ repmat(x(edgePts1(i)+1, :), edgePts1(i+1)-edgePts1(i), 1);
+        t(edgePts1(i)+1 : edgePts1(i+1)) = (tribeT - min(tribeT))/6;
+        [st, I] = sort(t(edgePts1(i)+1 : edgePts1(i+1)));
+        t(edgePts1(i)+1 : edgePts1(i+1)) = st;
+        x(edgePts1(i)+1 : edgePts1(i+1), :) = x(I+edgePts1(i),:);
+        tx = (x(edgePts1(i)+2 : edgePts1(i+1), :) - repmat(x(edgePts1(i)+1,:), edgePts1(i+1) - edgePts1(i) - 1, 1)) ./ repmat(x(edgePts1(i)+1,:), edgePts1(i+1) - edgePts1(i) - 1, 1);
+        
         if size(tx, 1) == 1
             continue
         end
         
-        for v = 2 : size(tx, 1)            
-            for r = 1 : size(tx, 2)
-                if tx(v,r) > tx(v-1,r)
-                     tx(v,r) = tx(v-1,r);
-                end
-            end
-        end
-        
-        x(edgePts1(i)+1 : edgePts1(i+1), :) = tx;
+%         for v = 2 : size(tx, 1)            
+%             for r = 1 : size(tx, 2)
+%                 if tx(v,r) > tx(v-1,r)
+%                      tx(v,r) = tx(v-1,r);
+%                 end
+%             end
+%         end
+
+        tribes{i} = size(newx,1)+1 : size(newx,1)+size(tx,1);
+        newx = [newx;tx];
+        newt = [newt;t(edgePts1(i)+2 : edgePts1(i+1))];
+        assert(size(newx,1)==size(newt,1));
     end
     c = makeFriends(tribes);
 end
